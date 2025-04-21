@@ -20,7 +20,7 @@ spec:
             - name: KAFKA_BROKERCONNECT
               value: "demo-kafka-bootstrap:9093"
             - name: KAFKA_PROPERTIES
-              value: " < Base64 encoded kafka.properties > "
+              value: "< Base64 encoded kafka.properties >"
           ports:
             - containerPort: 9000
           volumeMounts:
@@ -32,8 +32,8 @@ spec:
               memory: "256Mi"
               cpu: "250m"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "2Gi"
+              cpu: "1"
       volumes:
         - name: certs
           secret:
