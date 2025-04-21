@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafdrop-plain
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop-plain
+  template:
+    metadata:
+      labels:
+        app: kafdrop-plain
+    spec:
+      containers:
+        - name: kafdrop-plain
+          image: obsidiandynamics/kafdrop:latest
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: "demo-kafka-bootstrap:9092"
+            - name: JVM_OPTS
+              value: "-Xms32M -Xmx64M"
+            - name: SERVER_PORT
+              value: "9000"
+          ports:
+            - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafdrop-plain
+  namespace: kafka
+spec:
+  type: NodePort
+  ports:
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30001
+  selector:
+    app: kafdrop-plain

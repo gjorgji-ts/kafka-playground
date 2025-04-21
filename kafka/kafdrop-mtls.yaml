@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafdrop-mtls
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop-mtls
+  template:
+    metadata:
+      labels:
+        app: kafdrop-mtls
+    spec:
+      containers:
+        - name: kafdrop-mtls
+          image: obsidiandynamics/kafdrop:latest
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: "demo-kafka-bootstrap:9093"
+            - name: KAFKA_PROPERTIES
+              value: " < Base64 encoded kafka.properties > "
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+      volumes:
+        - name: certs
+          secret:
+            secretName: kafdrop-mtls-cert-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafdrop-mtls
+  namespace: kafka
+spec:
+  type: NodePort
+  ports:
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30000
+  selector:
+    app: kafdrop-mtls
